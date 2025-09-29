@@ -128,13 +128,15 @@ Date: ${new Date().toLocaleString()}
   }
 });
 
+// ============================
+// Serve Frontend
+// ============================
 app.use(express.static(path.join(__dirname, "public")));
 
-// For all routes → send index.html
-app.get("*", (req, res) => {
+// Catch-all fallback (for React/HTML routing)
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-
 
 // ============================
 // Start Server
@@ -143,3 +145,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
