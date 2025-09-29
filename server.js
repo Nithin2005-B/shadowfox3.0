@@ -128,13 +128,10 @@ Date: ${new Date().toLocaleString()}
   }
 });
 
-// ============================
-// Serve Static Frontend
-// ============================
 app.use(express.static(path.join(__dirname, "public")));
 
-// If no route matches, serve index.html
-app.get("/", (req, res) => {
+// For all routes → send index.html
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
