@@ -3,12 +3,21 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-const cors = require("cors");
+const path = require("path");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ============================
+// Serve Frontend Files
+// ============================
+app.use(express.static(path.join(__dirname, "public"))); // your HTML, CSS, JS in /public
+
+// Optional: redirect unknown routes to index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // ============================
 // MongoDB Connection
