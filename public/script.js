@@ -13,87 +13,89 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==============================
 // CONFIG
 // ==============================
-const SERVER_URL = "https://shadowfox3-0.onrender.com";
+const SERVER_URL = "https://shadowfox3-0.onrender.com"; // Your Render backend
 const apiUrl = (path) => SERVER_URL + path;
 
 console.log("script.js loaded ✅");
 
 // ==============================
-// Appointment Form Submit
+// HELPER FUNCTION
+// ==============================
+function handleFormSubmit(form, fieldsMap, endpoint, successMessage) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Prevent page reload
+    console.log(`${form.id} submitted`);
+
+    // Build payload from field IDs
+    const payload = {};
+    for (const [key, id] of Object.entries(fieldsMap)) {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.error(`Element with ID "${id}" not found`);
+        return;
+      }
+      payload[key] = el.value.trim();
+    }
+
+    // Validate required fields
+    for (const [key, value] of Object.entries(payload)) {
+      if (!value) {
+        alert(`⚠️ Please fill in ${key}`);
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch(apiUrl(endpoint), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log("Server response:", data);
+      alert(data.message || successMessage);
+      form.reset();
+    } catch (err) {
+      console.error(`${form.id} Error:`, err);
+      alert("⚠️ Unable to connect to server. Try again later.");
+    }
+  });
+}
+
+// ==============================
+// APPOINTMENT FORM
 // ==============================
 const appointmentForm = document.getElementById("appointmentForm");
-
 if (appointmentForm) {
-  console.log("Appointment form script active");
-
-  appointmentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    console.log("Appointment form submitted");
-
-    const name = document.getElementById("appointmentName").value.trim();
-    const email = document.getElementById("appointmentEmail").value.trim();
-    const phone = document.getElementById("appointmentPhone").value.trim();
-    const message = document.getElementById("appointmentMessage").value.trim();
-
-    if (!name || !email || !phone) {
-      alert("⚠️ Please fill all required fields");
-      return;
-    }
-
-    try {
-      const res = await fetch(apiUrl("/api/appointment"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, message }),
-      });
-
-      const data = await res.json();
-      console.log("Server response:", data);
-      alert(data.message || "Appointment submitted successfully ✅");
-      appointmentForm.reset();
-    } catch (err) {
-      console.error("Appointment Error:", err);
-      alert("⚠️ Unable to connect to server. Try again later.");
-    }
-  });
+  handleFormSubmit(
+    appointmentForm,
+    {
+      name: "appointmentName",
+      email: "appointmentEmail",
+      phone: "appointmentPhone",
+      message: "appointmentMessage",
+    },
+    "/api/appointment",
+    "Appointment submitted successfully ✅"
+  );
 }
 
 // ==============================
-// Treatment / Booking Form Submit
+// TREATMENT / BOOKING FORM
 // ==============================
 const treatmentForm = document.getElementById("treatmentForm");
-
 if (treatmentForm) {
-  console.log("Treatment form script active");
-
-  treatmentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    console.log("Treatment form submitted");
-
-    const treatment = document.getElementById("treatmentName").value.trim();
-    const name = document.getElementById("treatmentCustomerName").value.trim();
-    const email = document.getElementById("treatmentEmail").value.trim();
-    const phone = document.getElementById("treatmentPhone").value.trim();
-
-    if (!treatment || !name || !email || !phone) {
-      alert("⚠️ Please fill all required fields");
-      return;
-    }
-
-    try {
-      const res = await fetch(apiUrl("/api/booking"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ treatment, name, email, phone }),
-      });
-
-      const data = await res.json();
-      console.log("Server response:", data);
-      alert(data.message || "Booking submitted successfully ✅");
-      treatmentForm.reset();
-    } catch (err) {
-      console.error("Booking Error:", err);
-      alert("⚠️ Unable to connect to server. Try again later.");
-    }
-  });
+  handleFormSubmit(
+    treatmentForm,
+    {
+      treatment: "treatmentName",
+      name: "treatmentCustomerName",
+      email: "treatmentEmail",
+      phone: "treatmentPhone",
+    },
+    "/api/booking",
+    "Booking submitted successfully ✅"
+  );
 }
+
