@@ -19,27 +19,18 @@ const apiUrl = (path) => SERVER_URL + path;
 
 console.log("script.js loaded ✅");
 
-// ==============================
-// HELPER FUNCTION TO HANDLE FORM SUBMIT
-// ==============================
 function handleFormSubmit(formId, fieldsMap, endpoint, successMessage) {
   const form = document.getElementById(formId);
-  if (!form) {
-    console.error(`Form ${formId} not found`);
-    return;
-  }
+  if (!form) return console.error(`Form ${formId} not found`);
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault(); // prevent page reload
     console.log(`${formId} submitted`);
 
     const payload = {};
     for (const [key, id] of Object.entries(fieldsMap)) {
       const el = document.getElementById(id);
-      if (!el) {
-        console.error(`Element with ID "${id}" not found`);
-        return;
-      }
+      if (!el) return console.error(`Element with ID "${id}" not found`);
       payload[key] = el.value.trim();
     }
 
@@ -52,7 +43,7 @@ function handleFormSubmit(formId, fieldsMap, endpoint, successMessage) {
     }
 
     try {
-      const res = await fetch(apiUrl(endpoint), {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -68,9 +59,7 @@ function handleFormSubmit(formId, fieldsMap, endpoint, successMessage) {
   });
 }
 
-// ==============================
-// APPOINTMENT FORM
-// ==============================
+// Appointment form
 handleFormSubmit(
   "appointmentForm",
   {
@@ -83,9 +72,7 @@ handleFormSubmit(
   "Appointment submitted successfully ✅"
 );
 
-// ==============================
-// TREATMENT / BOOKING FORM
-// ==============================
+// Booking/Treatment form
 handleFormSubmit(
   "treatmentForm",
   {
