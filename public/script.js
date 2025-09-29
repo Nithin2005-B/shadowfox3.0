@@ -11,22 +11,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 // ==============================
+// ==============================
 // CONFIG
 // ==============================
-const SERVER_URL = "https://shadowfox3-0.onrender.com"; // Your Render backend
+const SERVER_URL = "https://shadowfox3-0.onrender.com"; // Backend URL
 const apiUrl = (path) => SERVER_URL + path;
 
 console.log("script.js loaded ✅");
 
 // ==============================
-// HELPER FUNCTION
+// HELPER FUNCTION TO HANDLE FORM SUBMIT
 // ==============================
-function handleFormSubmit(form, fieldsMap, endpoint, successMessage) {
+function handleFormSubmit(formId, fieldsMap, endpoint, successMessage) {
+  const form = document.getElementById(formId);
+  if (!form) {
+    console.error(`Form ${formId} not found`);
+    return;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault(); // Prevent page reload
-    console.log(`${form.id} submitted`);
+    console.log(`${formId} submitted`);
 
-    // Build payload from field IDs
     const payload = {};
     for (const [key, id] of Object.entries(fieldsMap)) {
       const el = document.getElementById(id);
@@ -51,13 +57,12 @@ function handleFormSubmit(form, fieldsMap, endpoint, successMessage) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
       console.log("Server response:", data);
       alert(data.message || successMessage);
       form.reset();
     } catch (err) {
-      console.error(`${form.id} Error:`, err);
+      console.error(`${formId} Error:`, err);
       alert("⚠️ Unable to connect to server. Try again later.");
     }
   });
@@ -66,36 +71,29 @@ function handleFormSubmit(form, fieldsMap, endpoint, successMessage) {
 // ==============================
 // APPOINTMENT FORM
 // ==============================
-const appointmentForm = document.getElementById("appointmentForm");
-if (appointmentForm) {
-  handleFormSubmit(
-    appointmentForm,
-    {
-      name: "appointmentName",
-      email: "appointmentEmail",
-      phone: "appointmentPhone",
-      message: "appointmentMessage",
-    },
-    "/api/appointment",
-    "Appointment submitted successfully ✅"
-  );
-}
+handleFormSubmit(
+  "appointmentForm",
+  {
+    name: "appointmentName",
+    email: "appointmentEmail",
+    phone: "appointmentPhone",
+    message: "appointmentMessage",
+  },
+  "/api/appointment",
+  "Appointment submitted successfully ✅"
+);
 
 // ==============================
 // TREATMENT / BOOKING FORM
 // ==============================
-const treatmentForm = document.getElementById("treatmentForm");
-if (treatmentForm) {
-  handleFormSubmit(
-    treatmentForm,
-    {
-      treatment: "treatmentName",
-      name: "treatmentCustomerName",
-      email: "treatmentEmail",
-      phone: "treatmentPhone",
-    },
-    "/api/booking",
-    "Booking submitted successfully ✅"
-  );
-}
-
+handleFormSubmit(
+  "treatmentForm",
+  {
+    treatment: "treatmentName",
+    name: "treatmentCustomerName",
+    email: "treatmentEmail",
+    phone: "treatmentPhone",
+  },
+  "/api/booking",
+  "Booking submitted successfully ✅"
+);
